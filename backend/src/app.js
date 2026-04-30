@@ -15,19 +15,37 @@ const { notFound, errorHandler } = require("./middleware/errorHandler");
 const app = express();
 
 const normalizeOrigin = (origin) => origin.replace(/\/+$/, "");
+const isRailwayAppOrigin = (origin) => {
+  try {
+    const url = new URL(origin);
+    return url.protocol === "https:" && url.hostname.endsWith(".up.railway.app");
+  } catch (_error) {
+    return false;
+  }
+};
 
 const frontendUrlFallback = process.env.NODE_ENV === "production" ? "" : "http://localhost:5173";
-const allowedOrigins = (process.env.FRONTEND_URL || frontendUrlFallback)
+const configuredFrontendUrls = [process.env.FRONTEND_URL, process.env.FRONTEND_URLS]
+  .filter(Boolean)
+  .join(",");
+const allowedOrigins = (configuredFrontendUrls || frontendUrlFallback)
   .split(",")
   .map((origin) => origin.trim())
   .map(normalizeOrigin)
   .filter(Boolean);
+const allowRailwayOrigins =
+  process.env.NODE_ENV === "production" || Boolean(process.env.RAILWAY_ENVIRONMENT);
 
 app.use(helmet());
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || allowedOrigins.includes(normalizeOrigin(origin))) {
+      const isAllowedOrigin =
+        !origin ||
+        allowedOrigins.includes(normalizeOrigin(origin)) ||
+        (allowRailwayOrigins && isRailwayAppOrigin(origin));
+
+      if (isAllowedOrigin) {
         return callback(null, true);
       }
 
