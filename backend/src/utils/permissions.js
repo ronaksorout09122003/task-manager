@@ -1,4 +1,5 @@
-const isAdmin = (user) => user?.role === "ADMIN";
+const isSuperAdmin = (user) => user?.role === "SUPER_ADMIN";
+const isAdmin = (user) => user?.role === "ADMIN" || isSuperAdmin(user);
 
 const canPatchTaskStatus = (user, task) => {
   if (!user || !task) return false;
@@ -11,6 +12,7 @@ const canViewTask = (user, task) => {
 };
 
 module.exports = {
+  isSuperAdmin,
   isAdmin,
   canPatchTaskStatus,
   canViewTask,

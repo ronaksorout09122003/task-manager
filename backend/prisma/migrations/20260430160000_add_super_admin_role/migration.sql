@@ -1,0 +1,11 @@
+ALTER TYPE "Role" ADD VALUE IF NOT EXISTS 'SUPER_ADMIN' BEFORE 'ADMIN';
+
+UPDATE "User"
+SET "role" = 'SUPER_ADMIN'
+WHERE "id" = (
+  SELECT "id"
+  FROM "User"
+  WHERE "role" = 'ADMIN'
+  ORDER BY "createdAt" ASC
+  LIMIT 1
+);

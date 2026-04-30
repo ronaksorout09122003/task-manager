@@ -54,9 +54,12 @@ const statusMessages = {
 
 const safeServerMessages = new Set([
   "Account created",
-  "At least one admin must remain",
+  "At least one super admin must remain",
+  "Current password is incorrect",
   "Email is already registered",
   "Invalid email or password",
+  "Only a super admin can change roles",
+  "Only a super admin can create admin accounts",
   "Password must be at least 6 characters",
   "Session expired. Please sign in again.",
   "Tasks can only be assigned to members of the project",

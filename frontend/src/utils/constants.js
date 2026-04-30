@@ -18,6 +18,7 @@ export const PRIORITY_LABELS = {
 };
 
 export const ROLE_LABELS = {
+  SUPER_ADMIN: "Super Admin",
   ADMIN: "Admin",
   MEMBER: "Member",
 };

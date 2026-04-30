@@ -4,6 +4,7 @@ import Button from "./Button";
 import EmptyState from "./EmptyState";
 import TaskStatusSelect from "./TaskStatusSelect";
 import { formatDate, isOverdue } from "../utils/date";
+import { isAdmin as hasAdminAccess } from "../utils/roles";
 
 export default function TaskTable({
   tasks,
@@ -22,7 +23,7 @@ export default function TaskTable({
     );
   }
 
-  const isAdmin = currentUser?.role === "ADMIN";
+  const isAdmin = hasAdminAccess(currentUser);
 
   return (
     <div className="overflow-hidden rounded-xl border border-slateLine bg-white shadow-sm">
