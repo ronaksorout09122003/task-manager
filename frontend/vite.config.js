@@ -24,7 +24,6 @@ export default defineConfig(({ mode }) => {
       allowedHosts: [
         "confident-vision-production-a740.up.railway.app",
       ],
-
     },
   };
 });
