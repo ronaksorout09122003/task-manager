@@ -18,12 +18,14 @@ export default defineConfig(({ mode }) => {
     },
 
     preview: {
-      host: true, 
+      host: true,
       port: process.env.PORT ? Number(process.env.PORT) : 4173,
 
       allowedHosts: [
         "confident-vision-production-a740.up.railway.app",
       ],
     },
+
+    // Define environment variables --- IGNORE ---
   };
 });
