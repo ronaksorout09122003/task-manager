@@ -7,6 +7,10 @@ if (import.meta.env.DEV) {
   console.log("API base URL:", apiBaseUrl);
 }
 
+if (!apiBaseUrl) {
+  throw new Error("Missing VITE_API_URL. Set it to your backend API URL before building the frontend.");
+}
+
 const api = axios.create({
   baseURL: apiBaseUrl,
   timeout: 15000,
