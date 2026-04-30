@@ -16,6 +16,11 @@ export default defineConfig(({ mode }) => {
     },
     preview: {
       port: process.env.PORT ? Number(process.env.PORT) : 4173,
+      allowedHosts: [
+        'localhost',
+        '127.0.0.1',
+        '.up.railway.app',
+      ],
     },
   };
 });
