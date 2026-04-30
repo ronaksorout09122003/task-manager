@@ -44,7 +44,7 @@ export default function MemberManager({
               <option value="">Add team member</option>
               {availableUsers.map((user) => (
                 <option key={user.id} value={user.id}>
-                  {user.name} ({user.email})
+                  {user.name}
                 </option>
               ))}
             </SelectInput>
@@ -63,7 +63,6 @@ export default function MemberManager({
           >
             <div className="min-w-0">
               <p className="truncate font-semibold text-ink">{member.user.name}</p>
-              <p className="truncate text-sm text-slate-600">{member.user.email}</p>
               <Badge value={member.user.role} className="mt-2" />
             </div>
             {isAdmin && member.user.id !== lockedUserId ? (

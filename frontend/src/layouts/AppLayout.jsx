@@ -58,7 +58,6 @@ function SidebarContent({ onNavigate }) {
       <div className="border-t border-slateLine p-4">
         <div className="rounded-lg bg-slate-50 p-3">
           <p className="truncate text-sm font-bold text-ink">{user?.name}</p>
-          <p className="truncate text-xs text-slate-500">{user?.email}</p>
           <Badge value={user?.role} className="mt-2" />
         </div>
         <Button variant="ghost" className="mt-3 w-full justify-start" onClick={handleLogout}>

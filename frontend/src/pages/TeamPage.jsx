@@ -51,7 +51,7 @@ export default function TeamPage() {
         onSubmit={submitSearch}
       >
         <TextInput
-          placeholder="Search by name or email"
+          placeholder="Search by name"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           className="mt-0"
@@ -86,7 +86,6 @@ export default function TeamPage() {
                   <tr key={teamUser.id}>
                     <td className="px-4 py-4">
                       <p className="font-semibold text-ink">{teamUser.name}</p>
-                      <p className="text-sm text-slate-600">{teamUser.email}</p>
                     </td>
                     <td className="px-4 py-4">
                       <Badge value={teamUser.role} />
@@ -104,7 +103,7 @@ export default function TeamPage() {
           </div>
         </div>
       ) : (
-        <EmptyState title="No users found" description="Try another name or email." />
+        <EmptyState title="No users found" description="Try another name." />
       )}
     </div>
   );

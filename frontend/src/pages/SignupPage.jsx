@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import Button from "../components/Button";
-import { Field, TextInput } from "../components/FormControls";
+import { Field, PasswordInput, TextInput } from "../components/FormControls";
 import { useAuth } from "../context/AuthContext";
 import { getErrorMessage } from "../api/client";
 
@@ -44,20 +44,25 @@ export default function SignupPage() {
           <h1 className="mt-2 text-3xl font-bold text-ink">Create account</h1>
           <p className="mt-2 text-sm text-slate-600">New signups receive the Member role.</p>
         </div>
-        <form className="space-y-4" onSubmit={submit}>
+        <form className="space-y-4" onSubmit={submit} autoComplete="off">
           <Field label="Name" error={errors.name}>
-            <TextInput value={form.name} onChange={(event) => update("name", event.target.value)} />
+            <TextInput
+              autoComplete="off"
+              value={form.name}
+              onChange={(event) => update("name", event.target.value)}
+            />
           </Field>
           <Field label="Email" error={errors.email}>
             <TextInput
               type="email"
+              autoComplete="off"
               value={form.email}
               onChange={(event) => update("email", event.target.value)}
             />
           </Field>
           <Field label="Password" error={errors.password}>
-            <TextInput
-              type="password"
+            <PasswordInput
+              autoComplete="new-password"
               value={form.password}
               onChange={(event) => update("password", event.target.value)}
             />

@@ -3,12 +3,12 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { CheckCircle2 } from "lucide-react";
 import Button from "../components/Button";
-import { Field, TextInput } from "../components/FormControls";
+import { Field, PasswordInput, TextInput } from "../components/FormControls";
 import { useAuth } from "../context/AuthContext";
 import { getErrorMessage } from "../api/client";
 
 export default function LoginPage() {
-  const [form, setForm] = useState({ email: "admin@example.com", password: "Admin@123" });
+  const [form, setForm] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { login } = useAuth();
@@ -66,9 +66,7 @@ export default function LoginPage() {
             ))}
           </div>
         </div>
-        <p className="text-sm text-slate-400">
-          Use the seeded admin account to explore the full workflow.
-        </p>
+        <p className="text-sm text-slate-400">Secure access for your project workspace.</p>
       </section>
       <section className="flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md rounded-xl border border-slateLine bg-white p-8 shadow-soft">
@@ -77,17 +75,18 @@ export default function LoginPage() {
             <h2 className="mt-2 text-3xl font-bold text-ink">Sign in</h2>
             <p className="mt-2 text-sm text-slate-600">Enter your credentials to continue.</p>
           </div>
-          <form className="space-y-4" onSubmit={submit}>
+          <form className="space-y-4" onSubmit={submit} autoComplete="off">
             <Field label="Email" error={errors.email}>
               <TextInput
                 type="email"
+                autoComplete="off"
                 value={form.email}
                 onChange={(event) => update("email", event.target.value)}
               />
             </Field>
             <Field label="Password" error={errors.password}>
-              <TextInput
-                type="password"
+              <PasswordInput
+                autoComplete="new-password"
                 value={form.password}
                 onChange={(event) => update("password", event.target.value)}
               />

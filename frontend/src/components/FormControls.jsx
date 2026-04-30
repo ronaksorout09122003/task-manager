@@ -1,3 +1,5 @@
+import { Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
 import { classNames } from "../utils/classNames";
 
 const inputClass =
@@ -15,6 +17,29 @@ export function Field({ label, error, children }) {
 
 export function TextInput({ className = "", ...props }) {
   return <input className={classNames(inputClass, className)} {...props} />;
+}
+
+export function PasswordInput({ className = "", ...props }) {
+  const [isVisible, setIsVisible] = useState(false);
+  const Icon = isVisible ? EyeOff : Eye;
+
+  return (
+    <div className="relative mt-1">
+      <input
+        className={classNames(inputClass, "mt-0 pr-11", className)}
+        type={isVisible ? "text" : "password"}
+        {...props}
+      />
+      <button
+        type="button"
+        className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-r-lg text-slate-500 transition hover:text-ink focus:outline-none focus:ring-2 focus:ring-ocean focus:ring-offset-1"
+        onClick={() => setIsVisible((current) => !current)}
+        aria-label={isVisible ? "Hide password" : "Show password"}
+      >
+        <Icon className="h-4 w-4" aria-hidden="true" />
+      </button>
+    </div>
+  );
 }
 
 export function Textarea({ className = "", rows = 4, ...props }) {
