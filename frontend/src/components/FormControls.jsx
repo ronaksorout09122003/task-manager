@@ -3,7 +3,7 @@ import { useState } from "react";
 import { classNames } from "../utils/classNames";
 
 const inputClass =
-  "mt-1 w-full rounded-lg border border-slateLine bg-white px-3 py-2.5 text-sm text-ink shadow-sm transition placeholder:text-slate-400 focus:border-ocean";
+  "mt-1 w-full rounded-lg border border-slateLine bg-white px-3 py-2.5 text-sm text-ink shadow-sm placeholder:text-slate-400 focus:border-slateLine focus:outline-none focus:ring-0";
 
 export function Field({ label, error, children }) {
   return (

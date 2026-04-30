@@ -31,15 +31,6 @@ textarea {
   font: inherit;
 }
 
-button:focus-visible,
-a:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
-  outline: 3px solid rgba(79, 70, 229, 0.28);
-  outline-offset: 2px;
-}
-
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
