@@ -36,7 +36,7 @@ async function main() {
     name: "Avery Admin",
     email: "admin@example.com",
     password: "Admin@123",
-    role: "SUPER_ADMIN",
+    role: "ADMIN",
   });
 
   const member = await upsertUser({
@@ -182,7 +182,7 @@ async function main() {
   });
 
   console.log("Seed data created.");
-  console.log("Super Admin: admin@example.com / Admin@123");
+  console.log("Admin: admin@example.com / Admin@123");
   console.log("Member: member@example.com / Member@123");
 }
 

@@ -1,15 +1,14 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const {
+  signupSchema,
   projectCreateSchema,
   taskCreateSchema,
-  userCreateSchema,
   userRoleUpdateSchema,
-  passwordChangeSchema,
 } = require("../utils/validators");
 
-test("user creation validation rejects invalid email and short password", () => {
-  const result = userCreateSchema.safeParse({
+test("signup validation rejects invalid email and short password", () => {
+  const result = signupSchema.safeParse({
     name: "Riley",
     email: "not-an-email",
     password: "123",
@@ -55,31 +54,7 @@ test("task validation requires project member assignment input and a valid due d
 });
 
 test("role update validation only accepts supported roles", () => {
-  assert.equal(userRoleUpdateSchema.safeParse({ role: "SUPER_ADMIN" }).success, true);
   assert.equal(userRoleUpdateSchema.safeParse({ role: "ADMIN" }).success, true);
   assert.equal(userRoleUpdateSchema.safeParse({ role: "MEMBER" }).success, true);
   assert.equal(userRoleUpdateSchema.safeParse({ role: "OWNER" }).success, false);
-});
-
-test("user creation validation accepts supported roles and a password", () => {
-  const result = userCreateSchema.safeParse({
-    name: "New User",
-    email: "new@example.com",
-    password: "Secret123",
-    role: "ADMIN",
-  });
-
-  assert.equal(result.success, true);
-  assert.equal(result.data.role, "ADMIN");
-});
-
-test("password change validation requires a current and new password", () => {
-  assert.equal(
-    passwordChangeSchema.safeParse({ currentPassword: "old", newPassword: "newpass" }).success,
-    true,
-  );
-  assert.equal(
-    passwordChangeSchema.safeParse({ currentPassword: "", newPassword: "123" }).success,
-    false,
-  );
 });
