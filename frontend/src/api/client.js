@@ -1,8 +1,11 @@
 import axios from "axios";
 import { clearStoredToken, getStoredToken } from "../utils/storage";
 
-const apiBaseUrl =
-  import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? "http://localhost:5000/api" : "/api");
+const apiBaseUrl = import.meta.env.VITE_API_URL;
+
+if (import.meta.env.DEV) {
+  console.log("API base URL:", apiBaseUrl);
+}
 
 const api = axios.create({
   baseURL: apiBaseUrl,
