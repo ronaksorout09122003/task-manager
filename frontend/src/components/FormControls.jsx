@@ -24,10 +24,10 @@ export function PasswordInput({ className = "", ...props }) {
   const Icon = isVisible ? EyeOff : Eye;
 
   return (
-    <div className="mt-1 flex items-center rounded-lg border border-slateLine bg-white shadow-sm transition focus-within:border-ocean focus-within:ring-2 focus-within:ring-ocean/20">
+    <div className="mt-1 flex items-center rounded-lg border border-slateLine bg-white shadow-sm">
       <input
         className={classNames(
-          "min-w-0 flex-1 rounded-l-lg border-0 bg-transparent px-3 py-2.5 text-sm text-ink outline-none placeholder:text-slate-400",
+          "min-w-0 flex-1 rounded-l-lg border-0 bg-transparent px-3 py-2.5 text-sm text-ink outline-none ring-0 placeholder:text-slate-400 focus:outline-none focus:ring-0",
           className,
         )}
         type={isVisible ? "text" : "password"}
