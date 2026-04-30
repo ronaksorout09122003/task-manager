@@ -4,11 +4,8 @@
   "private": true,
   "description": "Workspace tooling for the Team Task Manager full-stack application.",
   "scripts": {
-    "build": "npm run build:frontend",
-    "build:frontend": "npm --prefix frontend ci --include=dev && npm --prefix frontend run build",
     "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "start": "npm --prefix frontend run preview -- --host 0.0.0.0"
+    "format:check": "prettier --check ."
   },
   "devDependencies": {
     "prettier": "^3.6.2"
