@@ -1,0 +1,13 @@
+{
+  "name": "team-task-manager-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Workspace tooling for the Team Task Manager full-stack application.",
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "prettier": "^3.6.2"
+  }
+}
