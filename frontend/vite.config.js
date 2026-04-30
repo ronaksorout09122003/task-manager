@@ -6,16 +6,24 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
+
     build: {
       cssMinify: readableBuild ? false : "esbuild",
       minify: readableBuild ? false : "esbuild",
       sourcemap: readableBuild,
     },
+
     server: {
       port: 5173,
     },
+
     preview: {
+      host: true, 
       port: process.env.PORT ? Number(process.env.PORT) : 4173,
+
+      allowedHosts: [
+        "confident-vision-production-a740.up.railway.app",
+      ],
     },
   };
 });
