@@ -43,6 +43,15 @@ if (process.env.NODE_ENV !== "test") {
   app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 }
 
+app.get("/", (_req, res) => {
+  res.json({
+    status: "ok",
+    service: "team-task-manager-api",
+    message: "Backend is running. Use /api routes from the frontend.",
+    health: "/api/health",
+  });
+});
+
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok", service: "team-task-manager-api" });
 });

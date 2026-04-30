@@ -3,6 +3,8 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig(({ mode }) => {
   const readableBuild = mode === "readable";
+  const port = process.env.PORT ? Number(process.env.PORT) : 4173;
+  const isRailway = Boolean(process.env.RAILWAY_ENVIRONMENT);
 
   return {
     plugins: [react()],
@@ -19,13 +21,9 @@ export default defineConfig(({ mode }) => {
 
     preview: {
       host: true,
-      port: process.env.PORT ? Number(process.env.PORT) : 4173,
-
-      allowedHosts: [
-        "confident-vision-production-a740.up.railway.app",
-      ],
+      port,
+      allowedHosts: isRailway ? true : undefined,
     },
 
-    // Define environment variables --- IGNORE ---
   };
 });
