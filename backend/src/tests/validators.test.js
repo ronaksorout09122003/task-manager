@@ -1,6 +1,11 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { signupSchema, projectCreateSchema, taskCreateSchema } = require("../utils/validators");
+const {
+  signupSchema,
+  projectCreateSchema,
+  taskCreateSchema,
+  userRoleUpdateSchema,
+} = require("../utils/validators");
 
 test("signup validation rejects invalid email and short password", () => {
   const result = signupSchema.safeParse({
@@ -46,4 +51,10 @@ test("task validation requires project member assignment input and a valid due d
   assert.equal(result.success, true);
   assert.equal(result.data.priority, "HIGH");
   assert.equal(result.data.dueDate instanceof Date, true);
+});
+
+test("role update validation only accepts supported roles", () => {
+  assert.equal(userRoleUpdateSchema.safeParse({ role: "ADMIN" }).success, true);
+  assert.equal(userRoleUpdateSchema.safeParse({ role: "MEMBER" }).success, true);
+  assert.equal(userRoleUpdateSchema.safeParse({ role: "OWNER" }).success, false);
 });

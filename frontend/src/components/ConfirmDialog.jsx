@@ -8,6 +8,7 @@ export default function ConfirmDialog({
   title = "Confirm action",
   description,
   confirmLabel = "Delete",
+  confirmVariant = "danger",
   isLoading = false,
 }) {
   return (
@@ -16,7 +17,7 @@ export default function ConfirmDialog({
         <Button variant="secondary" onClick={onClose} disabled={isLoading}>
           Cancel
         </Button>
-        <Button variant="danger" onClick={onConfirm} isLoading={isLoading}>
+        <Button variant={confirmVariant} onClick={onConfirm} isLoading={isLoading}>
           {confirmLabel}
         </Button>
       </div>

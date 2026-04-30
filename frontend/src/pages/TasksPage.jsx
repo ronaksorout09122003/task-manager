@@ -6,9 +6,9 @@ import ConfirmDialog from "../components/ConfirmDialog";
 import EmptyState from "../components/EmptyState";
 import LoadingSpinner from "../components/LoadingSpinner";
 import PageHeader from "../components/PageHeader";
+import TaskBoard from "../components/TaskBoard";
 import TaskFilters from "../components/TaskFilters";
 import TaskFormModal from "../components/TaskFormModal";
-import TaskTable from "../components/TaskTable";
 import { useAuth } from "../context/AuthContext";
 
 export default function TasksPage() {
@@ -80,11 +80,19 @@ export default function TasksPage() {
   };
 
   const updateTaskStatus = async (task, status) => {
+    if (!task || task.status === status) return;
+
+    const previousTasks = tasks;
+    setTasks((current) =>
+      current.map((item) => (item.id === task.id ? { ...item, status } : item)),
+    );
+
     try {
       const { data } = await tasksApi.updateStatus(task.id, status);
       setTasks((current) => current.map((item) => (item.id === task.id ? data.task : item)));
       toast.success("Task status updated");
     } catch (requestError) {
+      setTasks(previousTasks);
       toast.error(getErrorMessage(requestError));
     }
   };
@@ -120,7 +128,7 @@ export default function TasksPage() {
       <div className="mb-5">
         <TaskFilters filters={filters} onChange={setFilters} users={users} isAdmin={isAdmin} />
       </div>
-      <TaskTable
+      <TaskBoard
         tasks={tasks}
         currentUser={user}
         onEdit={openEditTask}

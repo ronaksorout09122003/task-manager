@@ -48,7 +48,48 @@ const getUserById = asyncHandler(async (req, res) => {
   res.json({ user });
 });
 
+const updateUserRole = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { role } = req.body;
+
+  const existingUser = await prisma.user.findUnique({
+    where: { id },
+    select: { id: true, role: true },
+  });
+
+  if (!existingUser) {
+    throw new ApiError(404, "User not found");
+  }
+
+  if (existingUser.role === "ADMIN" && role !== "ADMIN") {
+    const adminCount = await prisma.user.count({
+      where: { role: "ADMIN" },
+    });
+
+    if (adminCount <= 1) {
+      throw new ApiError(400, "At least one admin must remain");
+    }
+  }
+
+  const user = await prisma.user.update({
+    where: { id },
+    data: { role },
+    select: {
+      ...userSelect,
+      _count: {
+        select: {
+          projectMemberships: true,
+          assignedTasks: true,
+        },
+      },
+    },
+  });
+
+  res.json({ user });
+});
+
 module.exports = {
   getUsers,
   getUserById,
+  updateUserRole,
 };

@@ -20,6 +20,7 @@ export const authApi = {
 export const usersApi = {
   list: (search = "") => api.get(withQuery("/users", { search })),
   getById: (id) => api.get(`/users/${id}`),
+  updateRole: (id, role) => api.patch(`/users/${id}/role`, { role }),
 };
 
 export const projectsApi = {

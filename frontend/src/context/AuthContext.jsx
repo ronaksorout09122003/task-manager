@@ -57,6 +57,12 @@ export function AuthProvider({ children }) {
     return data.user;
   };
 
+  const refreshUser = async () => {
+    const { data } = await authApi.me();
+    setUser(data.user);
+    return data.user;
+  };
+
   const value = useMemo(
     () => ({
       user,
@@ -65,6 +71,7 @@ export function AuthProvider({ children }) {
       isAuthenticated: Boolean(user && token),
       login: (payload) => authenticate(authApi.login, payload),
       signup: (payload) => authenticate(authApi.signup, payload),
+      refreshUser,
       logout: () => {
         clearStoredToken();
         setToken(null);

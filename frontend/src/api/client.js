@@ -37,7 +37,51 @@ api.interceptors.response.use(
   },
 );
 
-export const getErrorMessage = (error) =>
-  error.response?.data?.message || error.message || "Something went wrong";
+const fallbackMessage = "Something went wrong. Please try again.";
+
+const statusMessages = {
+  400: "Please check the form and try again.",
+  401: "Session expired. Please sign in again.",
+  403: "You do not have permission to do that.",
+  404: "We could not find what you were looking for.",
+  409: "This information is already in use.",
+  422: "Please check the form and try again.",
+  429: "Too many attempts. Please wait and try again.",
+  500: fallbackMessage,
+  502: "The server is temporarily unavailable. Please try again.",
+  503: "The server is temporarily unavailable. Please try again.",
+};
+
+const safeServerMessages = new Set([
+  "Account created",
+  "At least one admin must remain",
+  "Email is already registered",
+  "Invalid email or password",
+  "Password must be at least 6 characters",
+  "Session expired. Please sign in again.",
+  "Tasks can only be assigned to members of the project",
+]);
+
+export const getErrorMessage = (error) => {
+  if (!error) return fallbackMessage;
+
+  if (error.code === "ECONNABORTED") {
+    return "The request timed out. Please try again.";
+  }
+
+  if (!error.response) {
+    return "Network error. Please check your connection and try again.";
+  }
+
+  const { status, data } = error.response;
+  const firstDetail = Array.isArray(data?.details) ? data.details[0]?.message : null;
+  const serverMessage = firstDetail || data?.message;
+
+  if (serverMessage && (status === 400 || safeServerMessages.has(serverMessage))) {
+    return serverMessage;
+  }
+
+  return statusMessages[status] || fallbackMessage;
+};
 
 export default api;

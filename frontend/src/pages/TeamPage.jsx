@@ -1,18 +1,23 @@
 import { useEffect, useState } from "react";
 import { Search } from "lucide-react";
+import toast from "react-hot-toast";
 import { getErrorMessage } from "../api/client";
 import { usersApi } from "../api/resources";
-import Badge from "../components/Badge";
 import Button from "../components/Button";
+import ConfirmDialog from "../components/ConfirmDialog";
 import EmptyState from "../components/EmptyState";
-import { TextInput } from "../components/FormControls";
+import { SelectInput, TextInput } from "../components/FormControls";
 import LoadingSpinner from "../components/LoadingSpinner";
 import PageHeader from "../components/PageHeader";
+import { useAuth } from "../context/AuthContext";
 
 export default function TeamPage() {
+  const { user, refreshUser } = useAuth();
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isRoleSaving, setIsRoleSaving] = useState(false);
+  const [roleChange, setRoleChange] = useState(null);
   const [error, setError] = useState("");
 
   const loadUsers = async () => {
@@ -35,6 +40,35 @@ export default function TeamPage() {
   const submitSearch = (event) => {
     event.preventDefault();
     loadUsers();
+  };
+
+  const requestRoleChange = (teamUser, nextRole) => {
+    if (!teamUser || teamUser.role === nextRole) return;
+    setRoleChange({ user: teamUser, role: nextRole });
+  };
+
+  const confirmRoleChange = async () => {
+    if (!roleChange) return;
+
+    setIsRoleSaving(true);
+    try {
+      const { data } = await usersApi.updateRole(roleChange.user.id, roleChange.role);
+      setUsers((current) =>
+        current.map((teamUser) => (teamUser.id === data.user.id ? data.user : teamUser)),
+      );
+
+      if (data.user.id === user?.id) {
+        await refreshUser();
+      }
+
+      toast.success("Role updated");
+      setRoleChange(null);
+    } catch (requestError) {
+      setRoleChange(null);
+      toast.error(getErrorMessage(requestError));
+    } finally {
+      setIsRoleSaving(false);
+    }
   };
 
   if (isLoading) return <LoadingSpinner label="Loading team" />;
@@ -88,7 +122,16 @@ export default function TeamPage() {
                       <p className="font-semibold text-ink">{teamUser.name}</p>
                     </td>
                     <td className="px-4 py-4">
-                      <Badge value={teamUser.role} />
+                      <SelectInput
+                        className="mt-0 w-36"
+                        value={teamUser.role}
+                        onChange={(event) => requestRoleChange(teamUser, event.target.value)}
+                        disabled={isRoleSaving}
+                        aria-label={`Change role for ${teamUser.name}`}
+                      >
+                        <option value="ADMIN">Admin</option>
+                        <option value="MEMBER">Member</option>
+                      </SelectInput>
                     </td>
                     <td className="px-4 py-4 text-sm font-semibold text-slate-700">
                       {teamUser._count?.projectMemberships || 0}
@@ -105,6 +148,20 @@ export default function TeamPage() {
       ) : (
         <EmptyState title="No users found" description="Try another name." />
       )}
+      <ConfirmDialog
+        isOpen={Boolean(roleChange)}
+        onClose={() => setRoleChange(null)}
+        onConfirm={confirmRoleChange}
+        isLoading={isRoleSaving}
+        title="Change user role?"
+        description={
+          roleChange
+            ? `${roleChange.user.name} will become ${roleChange.role === "ADMIN" ? "an admin" : "a member"}.`
+            : ""
+        }
+        confirmLabel="Change role"
+        confirmVariant="primary"
+      />
     </div>
   );
 }

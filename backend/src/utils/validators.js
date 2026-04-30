@@ -99,6 +99,10 @@ const taskStatusSchema = z.object({
   status: TaskStatus,
 });
 
+const userRoleUpdateSchema = z.object({
+  role: Role,
+});
+
 const taskFilterSchema = z.object({
   status: TaskStatus.optional(),
   priority: TaskPriority.optional(),
@@ -119,5 +123,6 @@ module.exports = {
   taskCreateSchema,
   taskUpdateSchema,
   taskStatusSchema,
+  userRoleUpdateSchema,
   taskFilterSchema,
 };
