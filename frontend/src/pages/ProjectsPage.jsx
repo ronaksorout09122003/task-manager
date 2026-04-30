@@ -14,7 +14,6 @@ import ProgressBar from "../components/ProgressBar";
 import ProjectFormModal from "../components/ProjectFormModal";
 import { useAuth } from "../context/AuthContext";
 import { formatDate } from "../utils/date";
-import { isAdmin as hasAdminAccess } from "../utils/roles";
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState([]);
@@ -25,7 +24,7 @@ export default function ProjectsPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState(null);
   const { user } = useAuth();
-  const isAdmin = hasAdminAccess(user);
+  const isAdmin = user?.role === "ADMIN";
 
   const loadProjects = async () => {
     setIsLoading(true);

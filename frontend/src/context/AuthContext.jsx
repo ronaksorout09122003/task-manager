@@ -70,7 +70,7 @@ export function AuthProvider({ children }) {
       isLoading,
       isAuthenticated: Boolean(user && token),
       login: (payload) => authenticate(authApi.login, payload),
-      changePassword: (payload) => authApi.changePassword(payload),
+      signup: (payload) => authenticate(authApi.signup, payload),
       refreshUser,
       logout: () => {
         clearStoredToken();
