@@ -17,12 +17,13 @@ import TaskFormModal from "../components/TaskFormModal";
 import TaskTable from "../components/TaskTable";
 import { useAuth } from "../context/AuthContext";
 import { formatDate } from "../utils/date";
+import { isAdmin as hasAdminAccess } from "../utils/roles";
 
 export default function ProjectDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const isAdmin = user?.role === "ADMIN";
+  const isAdmin = hasAdminAccess(user);
   const [project, setProject] = useState(null);
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);

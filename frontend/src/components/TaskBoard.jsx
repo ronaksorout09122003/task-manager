@@ -15,6 +15,7 @@ import Badge from "./Badge";
 import Button from "./Button";
 import EmptyState from "./EmptyState";
 import { formatDate, isOverdue } from "../utils/date";
+import { isAdmin as hasAdminAccess } from "../utils/roles";
 
 const columns = [
   { status: "TODO", title: "Todo", tone: "border-slateLine bg-slate-50" },
@@ -23,7 +24,7 @@ const columns = [
 ];
 
 function TaskCard({ task, currentUser, isOverlay = false, onEdit, onDelete }) {
-  const isAdmin = currentUser?.role === "ADMIN";
+  const isAdmin = hasAdminAccess(currentUser);
   const canMove = isAdmin || task.assignedToId === currentUser?.id;
   const overdue = isOverdue(task);
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({

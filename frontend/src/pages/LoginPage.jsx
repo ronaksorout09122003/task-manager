@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { CheckCircle2 } from "lucide-react";
 import Button from "../components/Button";
@@ -56,7 +56,7 @@ export default function LoginPage() {
           <div className="mt-8 grid gap-4 text-sm text-slate-200">
             {[
               "JWT authentication",
-              "Admin and member roles",
+              "Super admin, admin, and member roles",
               "Real project progress and overdue tracking",
             ].map((item) => (
               <div key={item} className="flex items-center gap-3">
@@ -96,10 +96,7 @@ export default function LoginPage() {
             </Button>
           </form>
           <p className="mt-6 text-center text-sm text-slate-600">
-            Need an account?{" "}
-            <Link className="font-semibold text-ocean hover:text-oceanDark" to="/signup">
-              Create one
-            </Link>
+            Contact your administrator if you need access.
           </p>
         </div>
       </section>

@@ -13,12 +13,13 @@ const withQuery = (path, params = {}) => {
 
 export const authApi = {
   login: (payload) => api.post("/auth/login", payload),
-  signup: (payload) => api.post("/auth/signup", payload),
   me: () => api.get("/auth/me"),
+  changePassword: (payload) => api.patch("/auth/password", payload),
 };
 
 export const usersApi = {
   list: (search = "") => api.get(withQuery("/users", { search })),
+  create: (payload) => api.post("/users", payload),
   getById: (id) => api.get(`/users/${id}`),
   updateRole: (id, role) => api.patch(`/users/${id}/role`, { role }),
 };

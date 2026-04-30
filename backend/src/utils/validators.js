@@ -1,6 +1,6 @@
 const { z } = require("zod");
 
-const Role = z.enum(["ADMIN", "MEMBER"]);
+const Role = z.enum(["SUPER_ADMIN", "ADMIN", "MEMBER"]);
 const ProjectStatus = z.enum(["ACTIVE", "COMPLETED", "ARCHIVED"]);
 const TaskStatus = z.enum(["TODO", "IN_PROGRESS", "DONE"]);
 const TaskPriority = z.enum(["LOW", "MEDIUM", "HIGH"]);
@@ -18,15 +18,21 @@ const optionalDate = z.preprocess(
   z.coerce.date().optional(),
 );
 
-const signupSchema = z.object({
-  name: z.string().trim().min(1, "Name is required").max(120, "Name is too long"),
-  email: z.string().trim().email("Email must be valid").max(180, "Email is too long"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
-
 const loginSchema = z.object({
   email: z.string().trim().email("Email must be valid"),
   password: z.string().min(1, "Password is required"),
+});
+
+const userCreateSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(120, "Name is too long"),
+  email: z.string().trim().email("Email must be valid").max(180, "Email is too long"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  role: Role.optional().default("MEMBER"),
+});
+
+const passwordChangeSchema = z.object({
+  currentPassword: z.string().min(1, "Current password is required"),
+  newPassword: z.string().min(6, "New password must be at least 6 characters"),
 });
 
 const projectCreateSchema = z
@@ -115,8 +121,9 @@ module.exports = {
   ProjectStatus,
   TaskStatus,
   TaskPriority,
-  signupSchema,
   loginSchema,
+  userCreateSchema,
+  passwordChangeSchema,
   projectCreateSchema,
   projectUpdateSchema,
   projectMemberSchema,

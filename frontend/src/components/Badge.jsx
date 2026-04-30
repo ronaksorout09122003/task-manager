@@ -11,6 +11,7 @@ const toneClasses = {
   LOW: "bg-sky-50 text-sky-700 border-sky-200",
   MEDIUM: "bg-violet-50 text-violet-700 border-violet-200",
   HIGH: "bg-rose-50 text-rose-700 border-rose-200",
+  SUPER_ADMIN: "bg-amber-50 text-amber-700 border-amber-200",
   ADMIN: "bg-iris/10 text-iris border-indigo-200",
   MEMBER: "bg-slate-100 text-slate-700 border-slate-200",
   OVERDUE: "bg-rose-50 text-rose-700 border-rose-200",
