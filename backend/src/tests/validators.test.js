@@ -8,11 +8,10 @@ const {
   passwordChangeSchema,
 } = require("../utils/validators");
 
-test("user creation validation rejects invalid email and short password", () => {
+test("user creation validation rejects invalid email and missing name", () => {
   const result = userCreateSchema.safeParse({
-    name: "Riley",
+    name: "",
     email: "not-an-email",
-    password: "123",
   });
 
   assert.equal(result.success, false);
@@ -21,7 +20,7 @@ test("user creation validation rejects invalid email and short password", () => 
     true,
   );
   assert.equal(
-    result.error.issues.some((issue) => issue.path.includes("password")),
+    result.error.issues.some((issue) => issue.path.includes("name")),
     true,
   );
 });
@@ -61,11 +60,10 @@ test("role update validation only accepts supported roles", () => {
   assert.equal(userRoleUpdateSchema.safeParse({ role: "OWNER" }).success, false);
 });
 
-test("user creation validation accepts supported roles and a password", () => {
+test("user creation validation accepts supported roles without a password", () => {
   const result = userCreateSchema.safeParse({
     name: "New User",
     email: "new@example.com",
-    password: "Secret123",
     role: "ADMIN",
   });
 

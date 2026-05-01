@@ -1,14 +1,18 @@
 import { useEffect, useState } from "react";
 import Button from "./Button";
 import Badge from "./Badge";
-import { Field, PasswordInput, TextInput } from "./FormControls";
+import { Field, TextInput } from "./FormControls";
 import Modal from "./Modal";
 
 const initialForm = {
   name: "",
   email: "",
-  password: "",
   role: "MEMBER",
+};
+
+const getDefaultPassword = (name) => {
+  const firstName = name.trim().split(/\s+/)[0];
+  return firstName ? `${firstName.toLowerCase()}@123` : "firstname@123";
 };
 
 export default function UserFormModal({
@@ -35,7 +39,6 @@ export default function UserFormModal({
 
     if (!form.name.trim()) nextErrors.name = "Name is required";
     if (!form.email.trim()) nextErrors.email = "Email is required";
-    if (form.password.length < 6) nextErrors.password = "Password must be at least 6 characters";
     if (!form.role) nextErrors.role = "Role is required";
 
     setErrors(nextErrors);
@@ -44,7 +47,6 @@ export default function UserFormModal({
     await onSubmit({
       name: form.name.trim(),
       email: form.email.trim(),
-      password: form.password,
       role: form.role,
     });
   };
@@ -54,7 +56,7 @@ export default function UserFormModal({
       isOpen={isOpen}
       onClose={onClose}
       title="Add user"
-      description="Create a user account and share the password directly with the user."
+      description="Create a user account with a standard first-login password."
     >
       <form className="space-y-4" onSubmit={submit} autoComplete="off">
         <Field label="Name" error={errors.name}>
@@ -72,13 +74,12 @@ export default function UserFormModal({
             autoComplete="off"
           />
         </Field>
-        <Field label="Temporary password" error={errors.password}>
-          <PasswordInput
-            value={form.password}
-            onChange={(event) => update("password", event.target.value)}
-            autoComplete="new-password"
-          />
-        </Field>
+        <div className="rounded-lg border border-slateLine bg-slate-50 px-3 py-2">
+          <p className="text-sm font-semibold text-slate-700">Default password</p>
+          <p className="mt-1 font-mono text-sm font-bold text-ink">
+            {getDefaultPassword(form.name)}
+          </p>
+        </div>
         <Field label="Role" error={errors.role}>
           {roleOptions.length > 1 ? (
             <div className="mt-2 grid grid-cols-2 gap-2">

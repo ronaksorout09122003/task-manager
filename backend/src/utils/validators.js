@@ -26,7 +26,6 @@ const loginSchema = z.object({
 const userCreateSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(120, "Name is too long"),
   email: z.string().trim().email("Email must be valid").max(180, "Email is too long"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
   role: Role.optional().default("MEMBER"),
 });
 

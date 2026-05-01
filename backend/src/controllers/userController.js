@@ -15,6 +15,11 @@ const userListSelect = {
   },
 };
 
+const getDefaultPassword = (name) => {
+  const firstName = name.trim().split(/\s+/)[0].toLowerCase();
+  return `${firstName}@123`;
+};
+
 const getUsers = asyncHandler(async (req, res) => {
   const search = req.query.search?.trim();
 
@@ -35,7 +40,7 @@ const getUsers = asyncHandler(async (req, res) => {
 });
 
 const createUser = asyncHandler(async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email } = req.body;
   const role = req.body.role || "MEMBER";
 
   if (role === "SUPERADMIN") {
@@ -55,7 +60,7 @@ const createUser = asyncHandler(async (req, res) => {
     throw new ApiError(409, "Email is already registered");
   }
 
-  const hashedPassword = await bcrypt.hash(password, 12);
+  const hashedPassword = await bcrypt.hash(getDefaultPassword(name), 12);
   const user = await prisma.user.create({
     data: {
       name,
