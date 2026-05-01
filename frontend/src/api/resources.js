@@ -19,7 +19,9 @@ export const authApi = {
 
 export const usersApi = {
   list: (search = "") => api.get(withQuery("/users", { search })),
+  listTeam: (search = "") => api.get(withQuery("/users", { search, scope: "team" })),
   create: (payload) => api.post("/users", payload),
+  getAdminMembers: (id) => api.get(`/users/admins/${id}/members`),
   getById: (id) => api.get(`/users/${id}`),
   updateRole: (id, role) => api.patch(`/users/${id}/role`, { role }),
 };

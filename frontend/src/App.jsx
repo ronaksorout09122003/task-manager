@@ -8,6 +8,7 @@ import ProjectsPage from "./pages/ProjectsPage";
 import ProjectDetailsPage from "./pages/ProjectDetailsPage";
 import TasksPage from "./pages/TasksPage";
 import TeamPage from "./pages/TeamPage";
+import AdminMembersPage from "./pages/AdminMembersPage";
 import NotFoundPage from "./pages/NotFoundPage";
 
 export default function App() {
@@ -24,6 +25,7 @@ export default function App() {
             <Route path="/tasks" element={<TasksPage />} />
             <Route element={<AdminRoute />}>
               <Route path="/team" element={<TeamPage />} />
+              <Route path="/team/admins/:adminId" element={<AdminMembersPage />} />
             </Route>
           </Route>
         </Route>

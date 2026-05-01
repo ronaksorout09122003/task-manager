@@ -60,6 +60,7 @@ const safeServerMessages = new Set([
   "Email is already registered",
   "Invalid email or password",
   "Only one super admin is allowed",
+  "Super admin can only create admin accounts",
   "Only a super admin can change roles",
   "Only a super admin can create admin accounts",
   "Password must be at least 6 characters",

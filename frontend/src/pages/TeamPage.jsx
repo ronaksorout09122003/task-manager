@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Plus, Search } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ArrowRight, Plus, Search } from "lucide-react";
 import toast from "react-hot-toast";
 import { getErrorMessage } from "../api/client";
 import { usersApi } from "../api/resources";
@@ -13,16 +14,13 @@ import UserFormModal from "../components/UserFormModal";
 import { useAuth } from "../context/AuthContext";
 import { isSuperAdmin } from "../utils/roles";
 
-const elevatedRoleOptions = [
-  { value: "ADMIN", label: "Admin" },
-  { value: "MEMBER", label: "Member" },
-];
+const adminRoleOptions = [{ value: "ADMIN", label: "Admin" }];
 const memberRoleOptions = [{ value: "MEMBER", label: "Member" }];
 
 export default function TeamPage() {
   const { user } = useAuth();
-  const canManageRoles = isSuperAdmin(user);
-  const allowedCreateRoles = canManageRoles ? elevatedRoleOptions : memberRoleOptions;
+  const superAdmin = isSuperAdmin(user);
+  const allowedCreateRoles = superAdmin ? adminRoleOptions : memberRoleOptions;
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -33,7 +31,7 @@ export default function TeamPage() {
   const loadUsers = async () => {
     setIsLoading(true);
     try {
-      const { data } = await usersApi.list(search);
+      const { data } = await usersApi.listTeam(search);
       setUsers(data.users);
       setError("");
     } catch (requestError) {
@@ -57,7 +55,7 @@ export default function TeamPage() {
     try {
       const { data } = await usersApi.create(payload);
       setUsers((current) => [...current, data.user].sort((a, b) => a.name.localeCompare(b.name)));
-      toast.success("User created");
+      toast.success(superAdmin ? "Admin created" : "Member created");
       setIsUserModalOpen(false);
     } catch (requestError) {
       toast.error(getErrorMessage(requestError));
@@ -73,11 +71,15 @@ export default function TeamPage() {
     <div>
       <PageHeader
         title="Team"
-        description="Manage app-wide roles and review project participation."
+        description={
+          superAdmin
+            ? "Manage admins and review the members assigned under each admin."
+            : "Manage members created under your admin account."
+        }
         actions={
           <Button onClick={() => setIsUserModalOpen(true)}>
             <Plus className="h-4 w-4" aria-hidden="true" />
-            Add user
+            {superAdmin ? "Add admin" : "Add member"}
           </Button>
         }
       />
@@ -86,7 +88,7 @@ export default function TeamPage() {
         onSubmit={submitSearch}
       >
         <TextInput
-          placeholder="Search by name"
+          placeholder={superAdmin ? "Search admins by name" : "Search members by name"}
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           className="mt-0"
@@ -117,10 +119,12 @@ export default function TeamPage() {
                 <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
                   <div className="rounded-lg bg-slate-50 p-3">
                     <p className="text-xs font-bold uppercase tracking-normal text-slate-500">
-                      Projects
+                      {superAdmin ? "Members" : "Projects"}
                     </p>
                     <p className="mt-1 text-lg font-bold text-ink">
-                      {teamUser._count?.projectMemberships || 0}
+                      {superAdmin
+                        ? teamUser._count?.createdUsers || 0
+                        : teamUser._count?.projectMemberships || 0}
                     </p>
                   </div>
                   <div className="rounded-lg bg-slate-50 p-3">
@@ -132,6 +136,16 @@ export default function TeamPage() {
                     </p>
                   </div>
                 </div>
+
+                {superAdmin ? (
+                  <Link
+                    className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slateLine bg-white px-3 py-2 text-sm font-semibold text-ink transition hover:bg-slate-50"
+                    to={`/team/admins/${teamUser.id}`}
+                  >
+                    View members
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  </Link>
+                ) : null}
               </article>
             ))}
           </div>
@@ -142,34 +156,61 @@ export default function TeamPage() {
                 <thead className="bg-slate-50">
                   <tr>
                     <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-normal text-slate-500">
-                      User
+                      {superAdmin ? "Admin" : "Member"}
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-normal text-slate-500">
                       Role
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-normal text-slate-500">
-                      Projects
+                      {superAdmin ? "Members" : "Projects"}
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-normal text-slate-500">
                       Assigned tasks
                     </th>
+                    {superAdmin ? (
+                      <th className="px-4 py-3 text-right text-xs font-bold uppercase tracking-normal text-slate-500">
+                        Details
+                      </th>
+                    ) : null}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slateLine">
                   {users.map((teamUser) => (
                     <tr key={teamUser.id}>
                       <td className="px-4 py-4">
-                        <p className="font-semibold text-ink">{teamUser.name}</p>
+                        {superAdmin ? (
+                          <Link
+                            className="font-semibold text-ink transition hover:text-ocean"
+                            to={`/team/admins/${teamUser.id}`}
+                          >
+                            {teamUser.name}
+                          </Link>
+                        ) : (
+                          <p className="font-semibold text-ink">{teamUser.name}</p>
+                        )}
                       </td>
                       <td className="px-4 py-4">
                         <Badge value={teamUser.role} />
                       </td>
                       <td className="px-4 py-4 text-sm font-semibold text-slate-700">
-                        {teamUser._count?.projectMemberships || 0}
+                        {superAdmin
+                          ? teamUser._count?.createdUsers || 0
+                          : teamUser._count?.projectMemberships || 0}
                       </td>
                       <td className="px-4 py-4 text-sm font-semibold text-slate-700">
                         {teamUser._count?.assignedTasks || 0}
                       </td>
+                      {superAdmin ? (
+                        <td className="px-4 py-4 text-right">
+                          <Link
+                            className="inline-flex items-center justify-center gap-2 rounded-lg border border-slateLine bg-white px-3 py-2 text-sm font-semibold text-ink transition hover:bg-slate-50"
+                            to={`/team/admins/${teamUser.id}`}
+                          >
+                            Open
+                            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                          </Link>
+                        </td>
+                      ) : null}
                     </tr>
                   ))}
                 </tbody>
@@ -178,7 +219,14 @@ export default function TeamPage() {
           </div>
         </>
       ) : (
-        <EmptyState title="No users found" description="Try another name." />
+        <EmptyState
+          title={superAdmin ? "No admins found" : "No members found"}
+          description={
+            superAdmin
+              ? "Create an admin to start organizing members under them."
+              : "Create a member to assign project work."
+          }
+        />
       )}
       <UserFormModal
         isOpen={isUserModalOpen}
