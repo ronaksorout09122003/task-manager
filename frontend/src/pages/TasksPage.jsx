@@ -10,10 +10,11 @@ import TaskBoard from "../components/TaskBoard";
 import TaskFilters from "../components/TaskFilters";
 import TaskFormModal from "../components/TaskFormModal";
 import { useAuth } from "../context/AuthContext";
+import { isAdmin as hasAdminAccess } from "../utils/roles";
 
 export default function TasksPage() {
   const { user } = useAuth();
-  const isAdmin = user?.role === "ADMIN";
+  const isAdmin = hasAdminAccess(user);
   const [tasks, setTasks] = useState([]);
   const [users, setUsers] = useState([]);
   const [members, setMembers] = useState([]);

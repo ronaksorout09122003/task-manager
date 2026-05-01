@@ -1,8 +1,11 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { isAdmin, canPatchTaskStatus, canViewTask } = require("../utils/permissions");
+const { isAdmin, isSuperAdmin, canPatchTaskStatus, canViewTask } = require("../utils/permissions");
 
-test("isAdmin returns true only for admin users", () => {
+test("admin helpers identify elevated roles", () => {
+  assert.equal(isSuperAdmin({ role: "SUPERADMIN" }), true);
+  assert.equal(isSuperAdmin({ role: "ADMIN" }), false);
+  assert.equal(isAdmin({ role: "SUPERADMIN" }), true);
   assert.equal(isAdmin({ role: "ADMIN" }), true);
   assert.equal(isAdmin({ role: "MEMBER" }), false);
   assert.equal(isAdmin(null), false);
@@ -25,4 +28,12 @@ test("admins can update and view any task", () => {
 
   assert.equal(canPatchTaskStatus(admin, task), true);
   assert.equal(canViewTask(admin, task), true);
+});
+
+test("super admins can update and view any task", () => {
+  const superAdmin = { id: "super-admin-1", role: "SUPERADMIN" };
+  const task = { id: "task-1", assignedToId: "user-1" };
+
+  assert.equal(canPatchTaskStatus(superAdmin, task), true);
+  assert.equal(canViewTask(superAdmin, task), true);
 });

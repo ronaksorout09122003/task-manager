@@ -23,35 +23,6 @@ const generateToken = (user) => {
   );
 };
 
-const signup = asyncHandler(async (req, res) => {
-  const { name, email, password } = req.body;
-
-  const existingUser = await prisma.user.findUnique({
-    where: { email },
-    select: { id: true },
-  });
-
-  if (existingUser) {
-    throw new ApiError(409, "Email is already registered");
-  }
-
-  const hashedPassword = await bcrypt.hash(password, 12);
-  const user = await prisma.user.create({
-    data: {
-      name,
-      email,
-      password: hashedPassword,
-      role: "MEMBER",
-    },
-  });
-
-  const safeUser = sanitizeUser(user);
-  res.status(201).json({
-    user: safeUser,
-    token: generateToken(safeUser),
-  });
-});
-
 const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
@@ -75,6 +46,31 @@ const login = asyncHandler(async (req, res) => {
   });
 });
 
+const changePassword = asyncHandler(async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  const user = await prisma.user.findUnique({
+    where: { id: req.user.id },
+  });
+
+  if (!user) {
+    throw new ApiError(401, "Please sign in again");
+  }
+
+  const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+  if (!isPasswordValid) {
+    throw new ApiError(400, "Current password is incorrect");
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 12);
+  await prisma.user.update({
+    where: { id: req.user.id },
+    data: { password: hashedPassword },
+  });
+
+  res.json({ message: "Password updated" });
+});
+
 const me = asyncHandler(async (req, res) => {
   const user = await prisma.user.findUnique({
     where: { id: req.user.id },
@@ -85,7 +81,7 @@ const me = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
-  signup,
   login,
+  changePassword,
   me,
 };

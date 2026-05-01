@@ -1,10 +1,14 @@
 import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { CheckSquare, FolderKanban, LayoutDashboard, LogOut, Menu, Users, X } from "lucide-react";
+import toast from "react-hot-toast";
+import { CheckSquare, FolderKanban, KeyRound, LayoutDashboard, LogOut, Menu, Users, X } from "lucide-react";
+import { getErrorMessage } from "../api/client";
 import Badge from "../components/Badge";
 import Button from "../components/Button";
+import ChangePasswordModal from "../components/ChangePasswordModal";
 import { useAuth } from "../context/AuthContext";
 import { classNames } from "../utils/classNames";
+import { isAdmin, isSuperAdmin } from "../utils/roles";
 
 const navItems = [
   { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
@@ -14,12 +18,28 @@ const navItems = [
 ];
 
 function SidebarContent({ onNavigate }) {
-  const { user, logout } = useAuth();
+  const { user, changePassword, logout } = useAuth();
   const navigate = useNavigate();
+  const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+  const [isPasswordSaving, setIsPasswordSaving] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate("/login");
+  };
+
+  const submitPasswordChange = async (payload) => {
+    setIsPasswordSaving(true);
+    try {
+      await changePassword(payload);
+      toast.success("Password updated");
+      setPasswordModalOpen(false);
+    } catch (requestError) {
+      toast.error(getErrorMessage(requestError));
+      throw requestError;
+    } finally {
+      setIsPasswordSaving(false);
+    }
   };
 
   return (
@@ -37,7 +57,7 @@ function SidebarContent({ onNavigate }) {
       </div>
       <nav className="flex-1 space-y-1 px-3 py-4">
         {navItems
-          .filter((item) => !item.adminOnly || user?.role === "ADMIN")
+          .filter((item) => !item.adminOnly || isAdmin(user))
           .map((item) => (
             <NavLink
               key={item.to}
@@ -60,10 +80,24 @@ function SidebarContent({ onNavigate }) {
           <p className="truncate text-sm font-bold text-ink">{user?.name}</p>
           <Badge value={user?.role} className="mt-2" />
         </div>
+        <Button
+          variant="ghost"
+          className="mt-3 w-full justify-start"
+          onClick={() => setPasswordModalOpen(true)}
+        >
+          <KeyRound className="h-4 w-4" aria-hidden="true" />
+          Change password
+        </Button>
         <Button variant="ghost" className="mt-3 w-full justify-start" onClick={handleLogout}>
           <LogOut className="h-4 w-4" aria-hidden="true" />
           Logout
         </Button>
+        <ChangePasswordModal
+          isOpen={passwordModalOpen}
+          onClose={() => setPasswordModalOpen(false)}
+          onSubmit={submitPasswordChange}
+          isLoading={isPasswordSaving}
+        />
       </div>
     </div>
   );
@@ -92,7 +126,11 @@ export default function AppLayout() {
           <div>
             <p className="text-sm font-bold text-ink">Team Task Manager</p>
             <p className="text-xs text-slate-500">
-              {user?.role === "ADMIN" ? "Admin workspace" : "Member workspace"}
+              {isSuperAdmin(user)
+                ? "Super admin workspace"
+                : isAdmin(user)
+                  ? "Admin workspace"
+                  : "Member workspace"}
             </p>
           </div>
         </div>
