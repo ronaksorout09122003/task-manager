@@ -32,11 +32,18 @@ async function upsertUser({ name, email, password, role }) {
 }
 
 async function main() {
+  const superAdmin = await upsertUser({
+    name: "System Owner",
+    email: "owner@example.com",
+    password: "Owner@123",
+    role: "SUPERADMIN",
+  });
+
   const admin = await upsertUser({
-    name: "Avery Admin",
+    name: "Project Admin",
     email: "admin@example.com",
     password: "Admin@123",
-    role: "SUPERADMIN",
+    role: "ADMIN",
   });
 
   const member = await upsertUser({
@@ -51,6 +58,16 @@ async function main() {
     email: "noah@example.com",
     password: "Member@123",
     role: "MEMBER",
+  });
+
+  await prisma.user.update({
+    where: { id: admin.id },
+    data: { createdById: superAdmin.id },
+  });
+
+  await prisma.user.updateMany({
+    where: { id: { in: [member.id, memberTwo.id] } },
+    data: { createdById: admin.id },
   });
 
   const launchProject = await prisma.project.upsert({
@@ -182,8 +199,6 @@ async function main() {
   });
 
   console.log("Seed data created.");
-  console.log("Super Admin: admin@example.com / Admin@123");
-  console.log("Member: member@example.com / Member@123");
 }
 
 main()

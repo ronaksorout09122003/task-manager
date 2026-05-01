@@ -1,141 +1,131 @@
-# Team Task Manager - Full Stack Web App
+# Team Task Manager
 
-A production-ready full-stack task manager for teams. Admin users can create projects, manage project members, assign tasks, and view the full dashboard. Member users can view their projects, see assigned work, and update only their own task status.
+A full-stack task management app for small teams. Super admins manage admins, admins manage
+members and projects, and members work through assigned tasks.
 
 ## Features
 
 - JWT authentication with bcrypt password hashing
-- Admin and Member role-based access control
-- Project CRUD with status, start date, due date, members, and progress
-- Team directory and project member management for admins
-- Task CRUD with priority, status, due date, assignee, filters, and overdue highlighting
-- Real dashboard statistics from PostgreSQL, not hardcoded numbers
-- Responsive React UI with sidebar desktop navigation and mobile top navigation
-- Toasts, loading states, empty states, form validation, badges, modals, and delete confirmations
-- Prisma PostgreSQL schema, seed data, tests, Railway configs, and deployment guide
+- Super admin, admin, and member role model
+- Admin-created user accounts with default first-login passwords
+- Password change flow for every logged-in user
+- Project CRUD with members, due dates, status, and progress
+- Task CRUD with assignee, priority, status, due date, overdue state, and Kanban board
+- Drag-and-drop task status updates with optimistic UI
+- Dashboard metrics from PostgreSQL
+- Clean error handling for validation, network, and token-expiration failures
+- Responsive React UI for desktop and mobile
+- Railway-ready backend and frontend configuration
 
 ## Tech Stack
 
 Frontend:
 
-- React.js with Vite
+- React with Vite
 - Tailwind CSS
 - Axios
 - React Router
-- Lucide icons
+- dnd-kit
+- Lucide React
 - React Hot Toast
 
 Backend:
 
 - Node.js
-- Express.js
+- Express
+- Prisma
 - PostgreSQL
-- Prisma ORM
 - JWT
 - bcrypt
-- Zod validation
+- Zod
 - Helmet and CORS
 
-Testing and verification:
+Testing:
 
 - Node test runner
 - Vitest
-- Playwright screenshot verification
+- Playwright for visual smoke checks
 
-## Folder Structure
+## Project Structure
 
 ```text
-root/
-  backend/
-    prisma/
-      migrations/
-      schema.prisma
-      seed.js
-    src/
-      config/
-      controllers/
-      middleware/
-      routes/
-      tests/
-      utils/
-      app.js
-      server.js
-    package.json
-    .env.example
-    railway.json
-  frontend/
-    src/
-      api/
-      components/
-      context/
-      layouts/
-      pages/
-      routes/
-      utils/
-      App.jsx
-      main.jsx
-    package.json
-    .env.example
-    railway.json
-  docs/screenshots/
-  TESTING_CHECKLIST.md
-  docker-compose.yml
-  README.md
+backend/
+  prisma/
+    migrations/
+    schema.prisma
+    seed.js
+  src/
+    config/
+    controllers/
+    middleware/
+    routes/
+    tests/
+    utils/
+    app.js
+    server.js
+frontend/
+  src/
+    api/
+    components/
+    context/
+    layouts/
+    pages/
+    routes/
+    utils/
+    App.jsx
+    main.jsx
 ```
 
-## Database Schema Overview
+## Roles
 
-- `User`: name, unique email, hashed password, role, timestamps
-- `Project`: title, description, status, start date, optional due date, creator, timestamps
-- `ProjectMember`: project-user join table with unique `projectId + userId`
-- `Task`: title, description, priority, status, due date, project, assignee, creator, timestamps
+- `SUPERADMIN`: creates admins and reviews admins with their members.
+- `ADMIN`: creates members, manages projects, assigns tasks, and tracks team work.
+- `MEMBER`: views assigned projects and updates assigned task status.
 
-Enums:
+Only one super admin should exist. Public signup is disabled; new accounts are created from the
+Team page.
 
-- `Role`: `ADMIN`, `MEMBER`
-- `ProjectStatus`: `ACTIVE`, `COMPLETED`, `ARCHIVED`
-- `TaskStatus`: `TODO`, `IN_PROGRESS`, `DONE`
-- `TaskPriority`: `LOW`, `MEDIUM`, `HIGH`
+Default password for created users:
 
-## Role-Based Access
+```text
+firstname@123
+```
 
-Admins can create, update, and delete projects; add or remove project members; create, assign, update, and delete tasks; list users; and view full dashboard data.
+Example: `Sahil Kumar` gets `sahil@123`.
 
-Members can view projects where they are members, view assigned tasks, and update only their own task status. They cannot delete projects, assign tasks, list all users, update full task fields, or access admin-only routes.
-
-## API Routes
+## API Overview
 
 Auth:
 
-- `POST /api/auth/signup`
 - `POST /api/auth/login`
 - `GET /api/auth/me`
+- `PATCH /api/auth/password`
 
 Users:
 
 - `GET /api/users`
+- `POST /api/users`
 - `GET /api/users/:id`
+- `GET /api/users/admins/:id/members`
+- `PATCH /api/users/:id/role`
 
 Projects:
 
-- `POST /api/projects`
 - `GET /api/projects`
+- `POST /api/projects`
 - `GET /api/projects/:id`
 - `PUT /api/projects/:id`
 - `DELETE /api/projects/:id`
-
-Project Members:
-
+- `GET /api/projects/:id/members`
 - `POST /api/projects/:id/members`
 - `DELETE /api/projects/:id/members/:userId`
-- `GET /api/projects/:id/members`
 
 Tasks:
 
-- `POST /api/projects/:projectId/tasks`
 - `GET /api/tasks`
-- `GET /api/projects/:projectId/tasks`
 - `GET /api/tasks/:id`
+- `GET /api/projects/:projectId/tasks`
+- `POST /api/projects/:projectId/tasks`
 - `PUT /api/tasks/:id`
 - `PATCH /api/tasks/:id/status`
 - `DELETE /api/tasks/:id`
@@ -144,13 +134,17 @@ Dashboard:
 
 - `GET /api/dashboard/stats`
 
+Health:
+
+- `GET /api/health`
+
 ## Local Setup
 
 Prerequisites:
 
 - Node.js 20+
 - npm
-- Docker Desktop, or an existing PostgreSQL database
+- PostgreSQL or Docker Desktop
 
 Start PostgreSQL with Docker:
 
@@ -177,7 +171,7 @@ FRONTEND_URL=http://localhost:5173,http://127.0.0.1:5173
 NODE_ENV=development
 ```
 
-Run Prisma and seed:
+Run Prisma and start the API:
 
 ```bash
 npm run prisma:generate
@@ -197,10 +191,10 @@ cp .env.example .env
 Set `frontend/.env`:
 
 ```env
-VITE_API_BASE_URL=http://localhost:5000/api
+VITE_API_URL=http://localhost:5000/api
 ```
 
-Run the app:
+Start the frontend:
 
 ```bash
 npm run dev
@@ -208,30 +202,27 @@ npm run dev
 
 Open `http://localhost:5173`.
 
-## Test Credentials
+## Seed Accounts
 
-Admin:
+Seed data creates one super admin, one admin, and two members for local testing.
 
-- Email: `admin@example.com`
-- Password: `Admin@123`
+```text
+Super admin: owner@example.com / Owner@123
+Admin: admin@example.com / Admin@123
+Member: member@example.com / Member@123
+Member: noah@example.com / Member@123
+```
 
-Member:
+Change these credentials before using any real deployment.
 
-- Email: `member@example.com`
-- Password: `Member@123`
-
-Additional seeded member:
-
-- Email: `noah@example.com`
-- Password: `Member@123`
-
-## Test Commands
+## Scripts
 
 Backend:
 
 ```bash
 cd backend
 npm test
+npm run build
 ```
 
 Frontend:
@@ -250,171 +241,51 @@ npm run format
 npm run format:check
 ```
 
-Readable frontend build for code review:
+## Railway Deployment
 
-```bash
-cd frontend
-npm run build:readable
-```
+Backend service:
 
-The normal `npm run build` command stays optimized for deployment. Use `build:readable` only when you want the generated Vite/Tailwind files in `dist` to be easier to inspect locally.
+- Root directory: `backend`
+- Build command: `npm ci && npm run build`
+- Start command: `npm run prisma:deploy && npm start`
+- Healthcheck path: `/api/health`
 
-Full local verification results are documented in [TESTING_CHECKLIST.md](./TESTING_CHECKLIST.md).
-
-## Railway Deployment Guide
-
-### Backend on Railway
-
-1. Create a new Railway project.
-2. Add a PostgreSQL service.
-3. Add a backend service from the GitHub repository.
-4. Set the backend service root directory to `backend`.
-5. Connect the backend service to the Railway PostgreSQL service so Railway provides `DATABASE_URL`.
-6. Add backend environment variables:
-
-```env
-DATABASE_URL=<Railway PostgreSQL connection string>
-JWT_SECRET=<strong random production secret>
-JWT_EXPIRES_IN=7d
-FRONTEND_URL=<deployed frontend URL>
-NODE_ENV=production
-```
-
-Railway provides `PORT` automatically. Set it manually only if your hosting target requires a fixed port.
-
-7. Use this build command:
-
-```bash
-npm ci && npm run build
-```
-
-This runs `prisma generate`.
-
-8. Use this start command:
-
-```bash
-npm run prisma:deploy && npm start
-```
-
-This runs `prisma migrate deploy` against Railway PostgreSQL before starting Express.
-
-9. After the first successful deployment, run a one-off Railway command if you want seed data:
-
-```bash
-npm run seed
-```
-
-### Frontend on Vercel
-
-1. Import the repository into Vercel.
-2. Set root directory to `frontend`.
-3. Set environment variable:
-
-```env
-VITE_API_BASE_URL=https://your-railway-backend-url/api
-```
-
-4. Build command: `npm run build`
-5. Output directory: `dist`
-
-### Frontend on Railway
-
-1. Add another Railway service from the same GitHub repository.
-2. Set root directory to `frontend`.
-3. Set environment variable before building:
-
-```env
-VITE_API_BASE_URL=https://your-railway-backend-url/api
-```
-
-4. Build command:
-
-```bash
-npm ci && npm run build
-```
-
-5. Start command:
-
-```bash
-npm run preview -- --host 0.0.0.0 --port $PORT
-```
-
-After the frontend deploys, update the backend `FRONTEND_URL` to the deployed frontend URL and redeploy the backend if needed. `FRONTEND_URL` supports comma-separated origins, so you can temporarily include both preview and production frontend URLs.
-
-## Environment Variables
-
-Backend `.env.example`:
-
-```env
-DATABASE_URL=
-JWT_SECRET=
-JWT_EXPIRES_IN=7d
-PORT=5000
-FRONTEND_URL=http://localhost:5173
-NODE_ENV=development
-```
-
-Production backend values:
+Backend variables:
 
 ```env
 DATABASE_URL=<Railway PostgreSQL DATABASE_URL>
 JWT_SECRET=<strong random production secret>
 JWT_EXPIRES_IN=7d
-FRONTEND_URL=https://your-frontend-production-url
+FRONTEND_URL=https://your-frontend-url
 NODE_ENV=production
 ```
 
-Production example file: `backend/.env.production.example`.
+Frontend service:
 
-Frontend `.env.example`:
+- Root directory: `frontend`
+- Build command: `npm ci && npm run build`
+- Start command: `npm run preview -- --host 0.0.0.0 --port $PORT`
 
-```env
-VITE_API_BASE_URL=http://localhost:5000/api
-```
-
-Production frontend value:
+Frontend variables:
 
 ```env
-VITE_API_BASE_URL=https://your-railway-backend-url/api
+VITE_API_URL=https://your-backend-url/api
 ```
 
-Production example file: `frontend/.env.production.example`.
+After changing Railway variables, redeploy the affected service.
 
-## Screenshots
+## Verification
 
-Local screenshots are in [docs/screenshots](./docs/screenshots):
+Run these checks before pushing production changes:
 
-- Login page
-- Signup page
-- Dashboard
-- Projects page
-- Project details page
-- Task management page
-- Admin role actions
-- Member role restricted view
-- Mobile responsive view
+```bash
+cd backend
+npm test
+npm run build
 
-Capture Railway deployment success manually after deployment because it depends on the owner's Railway dashboard and live service URL.
+cd ../frontend
+npm test
+npm run build
+```
 
-## Live URL Placeholder
-
-- Backend: `https://your-railway-backend-url`
-- Frontend: `https://your-frontend-url`
-
-## GitHub Repo Placeholder
-
-- Repository: `https://github.com/your-username/team-task-manager`
-
-## Demo Video Instructions
-
-Record a 3-5 minute walkthrough covering:
-
-1. Admin login
-2. Dashboard stats
-3. Create/edit project
-4. Add project member
-5. Create and assign task
-6. Filter task list and show overdue task
-7. Login as member
-8. Show restricted actions and update own task status
-9. Mention Railway deployment configuration
+The detailed manual checklist is in `TESTING_CHECKLIST.md`.

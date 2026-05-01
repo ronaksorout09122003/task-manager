@@ -1,7 +1,16 @@
 import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { CheckSquare, FolderKanban, KeyRound, LayoutDashboard, LogOut, Menu, Users, X } from "lucide-react";
+import {
+  CheckSquare,
+  FolderKanban,
+  KeyRound,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  Users,
+  X,
+} from "lucide-react";
 import { getErrorMessage } from "../api/client";
 import Badge from "../components/Badge";
 import Button from "../components/Button";

@@ -66,15 +66,15 @@ export default function MemberManager({
               <Badge value={member.user.role} className="mt-2" />
             </div>
             {isAdmin && member.user.id !== lockedUserId ? (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-9 w-9 shrink-0 px-0 text-rose-600 hover:bg-rose-50"
+              <button
+                type="button"
+                className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-rose-100 bg-rose-50 px-3 text-xs font-bold text-rose-700 transition hover:border-rose-200 hover:bg-rose-100"
                 onClick={() => onRemove(member.user.id)}
                 aria-label={`Remove ${member.user.name}`}
               >
                 <X className="h-4 w-4" aria-hidden="true" />
-              </Button>
+                Remove
+              </button>
             ) : null}
           </div>
         ))}

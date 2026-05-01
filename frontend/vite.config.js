@@ -24,6 +24,5 @@ export default defineConfig(({ mode }) => {
       port,
       allowedHosts: isRailway ? true : undefined,
     },
-
   };
 });

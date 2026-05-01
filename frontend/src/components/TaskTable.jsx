@@ -1,6 +1,5 @@
 import { Edit3, Trash2 } from "lucide-react";
 import Badge from "./Badge";
-import Button from "./Button";
 import EmptyState from "./EmptyState";
 import TaskStatusSelect from "./TaskStatusSelect";
 import { formatDate, isOverdue } from "../utils/date";
@@ -93,24 +92,24 @@ export default function TaskTable({
                     <div className="flex justify-end gap-2">
                       {isAdmin ? (
                         <>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-9 w-9 px-0"
+                          <button
+                            type="button"
+                            className="inline-flex h-9 items-center justify-center gap-1.5 rounded-lg border border-slateLine bg-white px-3 text-xs font-bold text-slate-700 transition hover:bg-slate-50 hover:text-ink"
                             onClick={() => onEdit?.(task)}
-                            aria-label="Edit task"
+                            aria-label={`Edit ${task.title}`}
                           >
                             <Edit3 className="h-4 w-4" aria-hidden="true" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-9 w-9 px-0 text-rose-600 hover:bg-rose-50"
+                            Edit
+                          </button>
+                          <button
+                            type="button"
+                            className="inline-flex h-9 items-center justify-center gap-1.5 rounded-lg border border-rose-100 bg-rose-50 px-3 text-xs font-bold text-rose-700 transition hover:border-rose-200 hover:bg-rose-100"
                             onClick={() => onDelete?.(task)}
-                            aria-label="Delete task"
+                            aria-label={`Delete ${task.title}`}
                           >
                             <Trash2 className="h-4 w-4" aria-hidden="true" />
-                          </Button>
+                            Delete
+                          </button>
                         </>
                       ) : (
                         <span className="text-sm text-slate-400">Restricted</span>

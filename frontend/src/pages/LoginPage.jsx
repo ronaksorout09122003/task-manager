@@ -46,12 +46,12 @@ export default function LoginPage() {
           </div>
           <div>
             <p className="text-xl font-bold">Team Task Manager</p>
-            <p className="text-sm text-slate-300">Project delivery with clear ownership.</p>
+            <p className="text-sm text-slate-300">Project and task control for teams.</p>
           </div>
         </div>
         <div className="max-w-xl">
           <h1 className="text-5xl font-bold leading-tight tracking-normal">
-            Run projects, tasks, and team access from one calm workspace.
+            Manage projects, tasks, and team access in one workspace.
           </h1>
           <div className="mt-8 grid gap-4 text-sm text-slate-200">
             {[
@@ -66,7 +66,7 @@ export default function LoginPage() {
             ))}
           </div>
         </div>
-        <p className="text-sm text-slate-400">Secure access for your project workspace.</p>
+        <p className="text-sm text-slate-400">Sign in with an account created by your admin.</p>
       </section>
       <section className="flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md rounded-xl border border-slateLine bg-white p-8 shadow-soft">

@@ -1,10 +1,11 @@
 node_modules
 dist
 coverage
+.sixth
+*.log
 backend/node_modules
 frontend/node_modules
 frontend/dist
-docs/screenshots/*.png
 backend/prisma/migrations
 backend/prisma/schema.prisma
 package-lock.json

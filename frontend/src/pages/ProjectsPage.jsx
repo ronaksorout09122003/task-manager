@@ -169,24 +169,24 @@ export default function ProjectsPage() {
                         </Link>
                         {isAdmin ? (
                           <>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-9 w-9 px-0"
+                            <button
+                              type="button"
+                              className="inline-flex h-9 items-center justify-center gap-1.5 rounded-lg border border-slateLine bg-white px-3 text-xs font-bold text-slate-700 transition hover:bg-slate-50 hover:text-ink"
                               onClick={() => openEdit(project)}
-                              aria-label="Edit project"
+                              aria-label={`Edit ${project.title}`}
                             >
                               <Edit3 className="h-4 w-4" aria-hidden="true" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-9 w-9 px-0 text-rose-600 hover:bg-rose-50"
+                              Edit
+                            </button>
+                            <button
+                              type="button"
+                              className="inline-flex h-9 items-center justify-center gap-1.5 rounded-lg border border-rose-100 bg-rose-50 px-3 text-xs font-bold text-rose-700 transition hover:border-rose-200 hover:bg-rose-100"
                               onClick={() => setProjectToDelete(project)}
-                              aria-label="Delete project"
+                              aria-label={`Delete ${project.title}`}
                             >
                               <Trash2 className="h-4 w-4" aria-hidden="true" />
-                            </Button>
+                              Delete
+                            </button>
                           </>
                         ) : null}
                       </div>

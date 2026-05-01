@@ -1,128 +1,66 @@
 # Testing Checklist
 
-Last verified locally on April 30, 2026 with:
+Use this checklist before deployment or after role, auth, project, or task changes.
 
-- PostgreSQL via `docker compose up -d postgres`
-- Backend API on `http://127.0.0.1:5000`
-- Frontend on `http://127.0.0.1:5173`
-- Prisma migration `20260430070549_init`
-- Seed data from `backend/prisma/seed.js`
-- A-to-Z audit rerun after final fixes
+## Automated Checks
 
-## Automated Tests
+- [ ] Backend tests: `cd backend && npm test`
+- [ ] Backend build and Prisma generate: `cd backend && npm run build`
+- [ ] Prisma schema validation: `cd backend && npx prisma validate`
+- [ ] Frontend tests: `cd frontend && npm test`
+- [ ] Frontend production build: `cd frontend && npm run build`
+- [ ] Workspace formatting: `npm run format:check`
 
-- [x] Backend tests: `cd backend && npm test`
-- [x] Frontend tests: `cd frontend && npm test`
-- [x] Frontend production build: `cd frontend && npm run build`
-- [x] Frontend readable review build: `cd frontend && npm run build:readable`
-- [x] Workspace format check: `npm run format:check`
-- [x] Prisma generate: `cd backend && npm run prisma:generate`
-- [x] Prisma migration against PostgreSQL: `cd backend && npm run prisma:migrate -- --name init`
-- [x] Seed command: `cd backend && npm run seed`
-- [x] Seed command is idempotent and restores sample project memberships/tasks
-- [x] Frontend import/export graph verified by production build
-- [x] Backend import/export graph verified by server startup and live API checks
+## Auth and Roles
 
-## API Smoke Verification
+- [ ] Login works for super admin, admin, and member accounts.
+- [ ] Public signup is not available.
+- [ ] All users can change their password.
+- [ ] Invalid credentials show a friendly message.
+- [ ] Expired or invalid tokens redirect to login.
+- [ ] Super admin can create admins only.
+- [ ] Admin can create members only.
+- [ ] Member cannot access the Team page.
+- [ ] Super admin sees admins, not project/member task rows.
+- [ ] Opening an admin from Team shows only members under that admin.
 
-- [x] Invalid login returns `401`
-- [x] Invalid token rejected
-- [x] Allowed CORS origin returns the expected CORS header
-- [x] Disallowed CORS origin rejected with `403`
-- [x] Admin login works
-- [x] Member login works
-- [x] Duplicate signup returns `409`
-- [x] Auth, users, tasks, and dashboard responses do not expose password fields
-- [x] Admin can list users
-- [x] Member cannot list users
-- [x] Admin can create project
-- [x] Project validation rejects invalid title and invalid date ranges
-- [x] Admin can add project member
-- [x] Admin can create and assign task to a project member
-- [x] Member can view an assigned project
-- [x] Member cannot delete project
-- [x] Member cannot update full task fields
-- [x] Member can update own task status
-- [x] Dashboard stats load from database
-- [x] Admin can delete task
-- [x] Admin can delete project
+## Projects
 
-## Authentication
+- [ ] Admin can create, update, and delete a project.
+- [ ] Project creator is protected from member removal.
+- [ ] Admin can add and remove eligible project members.
+- [ ] Project progress is calculated from task status.
+- [ ] Member sees only accessible projects.
+- [ ] Member cannot create, update, or delete projects.
 
-- [x] Signup works for new users
-- [x] Login works
-- [x] Invalid login shows an error
-- [x] Logout works in the UI
-- [x] Protected routes redirect unauthenticated users
-- [x] Logged-in name and role are visible in the app shell
+## Tasks
 
-## Role Testing
+- [ ] Admin can create, update, delete, assign, and filter tasks.
+- [ ] Tasks can only be assigned to project members.
+- [ ] Member sees assigned tasks.
+- [ ] Member can update only assigned task status.
+- [ ] Drag-and-drop status changes update the backend.
+- [ ] Failed drag-and-drop updates revert in the UI.
+- [ ] Overdue tasks are highlighted.
 
-- [x] Admin can create project
-- [x] Admin can edit/delete project
-- [x] Admin can add members
-- [x] Admin can remove eligible members
-- [x] Admin can create/assign tasks
-- [x] Member cannot delete project
-- [x] Member cannot assign tasks to others
-- [x] Member can update own task status
-- [x] Member is redirected away from admin-only `/team`
+## Dashboard and UI
 
-## Project Testing
+- [ ] Dashboard stats load from API data.
+- [ ] Empty states appear when lists are empty.
+- [ ] Loading states appear during API requests.
+- [ ] Toast messages are user-friendly.
+- [ ] No raw backend errors leak into the UI.
+- [ ] Desktop layout has no overlapping text or controls.
+- [ ] Mobile layout works for dashboard, projects, tasks, and team pages.
+- [ ] Browser console has no unexpected errors.
 
-- [x] Create project
-- [x] View project list
-- [x] Open project details
-- [x] Edit project
-- [x] Delete project
-- [x] Add/remove members
-- [x] Project progress is calculated from completed tasks
-- [x] Project progress uses all project tasks while member task lists show only assigned tasks
+## Railway
 
-## Task Testing
-
-- [x] Create task
-- [x] Assign task to project member only
-- [x] Update task as admin
-- [x] Change status as assigned member
-- [x] Filter tasks by status, priority, assignee, and overdue state
-- [x] Overdue task highlight is visible
-- [x] Delete task as admin
-
-## Dashboard Testing
-
-- [x] Stats load correctly
-- [x] Counts match seeded database state
-- [x] Overdue count works
-- [x] Progress bars calculate correctly
-- [x] Recent tasks are loaded from API
-
-## UI Testing
-
-- [x] Desktop responsive layout captured in screenshots
-- [x] Mobile responsive layout captured in screenshots
-- [x] Forms are aligned and labeled
-- [x] Buttons and modals work
-- [x] Confirmation dialog appears before deletes
-- [x] Toast notifications appear for success/error states
-- [x] No unexpected browser console errors detected during Playwright pass
-- [x] No broken primary routes found during Playwright pass
-- [x] Empty states are implemented
-- [x] Project creator remove button is hidden in member management
-
-## Deployment Testing
-
-- [x] Railway backend config prepared in `backend/railway.json`
-- [x] Railway frontend config prepared in `frontend/railway.json`
-- [x] Production environment variable examples included
-- [x] Prisma deploy command documented
-- [x] Backend Railway build command: `npm ci && npm run build`
-- [x] Backend Railway start command: `npm run prisma:deploy && npm start`
-- [x] Frontend Railway build command: `npm ci && npm run build`
-- [x] Frontend Railway start command: `npm run preview -- --host 0.0.0.0 --port $PORT`
-- [x] Runtime start tools are production dependencies (`prisma` for backend, `vite` for frontend)
-- [ ] Backend starts on Railway: verify after connecting the user's Railway project
-- [ ] Railway PostgreSQL database connected: verify after Railway provisions `DATABASE_URL`
-- [ ] Frontend connects to deployed backend: verify after setting `VITE_API_BASE_URL`
-- [ ] CORS works on live URL: verify after setting `FRONTEND_URL`
-- [ ] Live login and dashboard work: verify after deployment
+- [ ] Backend root directory is `backend`.
+- [ ] Backend healthcheck path is `/api/health`.
+- [ ] Backend has `DATABASE_URL`, `JWT_SECRET`, `JWT_EXPIRES_IN`, `FRONTEND_URL`, and `NODE_ENV`.
+- [ ] Frontend root directory is `frontend`.
+- [ ] Frontend has `VITE_API_URL=https://your-backend-url/api`.
+- [ ] Railway PostgreSQL is running before backend deployment.
+- [ ] Backend healthcheck returns `{ "status": "ok", "service": "team-task-manager-api" }`.
+- [ ] Frontend login works against the deployed backend.

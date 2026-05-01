@@ -8,7 +8,9 @@ if (import.meta.env.DEV) {
 }
 
 if (!apiBaseUrl) {
-  throw new Error("Missing VITE_API_URL. Set it to your backend API URL before building the frontend.");
+  throw new Error(
+    "Missing VITE_API_URL. Set it to your backend API URL before building the frontend.",
+  );
 }
 
 const api = axios.create({
