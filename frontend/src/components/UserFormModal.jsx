@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Button from "./Button";
-import { Field, PasswordInput, SelectInput, TextInput } from "./FormControls";
+import Badge from "./Badge";
+import { Field, PasswordInput, TextInput } from "./FormControls";
 import Modal from "./Modal";
 
 const initialForm = {
@@ -79,13 +80,28 @@ export default function UserFormModal({
           />
         </Field>
         <Field label="Role" error={errors.role}>
-          <SelectInput value={form.role} onChange={(event) => update("role", event.target.value)}>
-            {roleOptions.map((role) => (
-              <option key={role.value} value={role.value}>
-                {role.label}
-              </option>
-            ))}
-          </SelectInput>
+          {roleOptions.length > 1 ? (
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              {roleOptions.map((role) => (
+                <button
+                  key={role.value}
+                  type="button"
+                  className={`rounded-lg border px-3 py-2 text-sm font-semibold transition ${
+                    form.role === role.value
+                      ? "border-ocean bg-ocean text-white"
+                      : "border-slateLine bg-white text-slate-700 hover:bg-slate-50"
+                  }`}
+                  onClick={() => update("role", role.value)}
+                >
+                  {role.label}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="mt-2 rounded-lg border border-slateLine bg-slate-50 px-3 py-2">
+              <Badge value={form.role} />
+            </div>
+          )}
         </Field>
         <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
           <Button variant="secondary" onClick={onClose} disabled={isLoading}>

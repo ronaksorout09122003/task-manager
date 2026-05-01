@@ -5,59 +5,29 @@ import { getErrorMessage } from "../api/client";
 import { usersApi } from "../api/resources";
 import Badge from "../components/Badge";
 import Button from "../components/Button";
-import ConfirmDialog from "../components/ConfirmDialog";
 import EmptyState from "../components/EmptyState";
-import { SelectInput, TextInput } from "../components/FormControls";
+import { TextInput } from "../components/FormControls";
 import LoadingSpinner from "../components/LoadingSpinner";
 import PageHeader from "../components/PageHeader";
 import UserFormModal from "../components/UserFormModal";
 import { useAuth } from "../context/AuthContext";
-import { ROLE_LABELS } from "../utils/constants";
 import { isSuperAdmin } from "../utils/roles";
 
-const roleOptions = [
-  { value: "SUPERADMIN", label: "Super Admin" },
+const elevatedRoleOptions = [
   { value: "ADMIN", label: "Admin" },
   { value: "MEMBER", label: "Member" },
 ];
 const memberRoleOptions = [{ value: "MEMBER", label: "Member" }];
 
-const roleLabel = (role) => ROLE_LABELS[role] || role;
-const roleSentence = (role) => {
-  if (role === "SUPERADMIN") return "a super admin";
-  if (role === "ADMIN") return "an admin";
-  return "a member";
-};
-
-function RoleSelect({ teamUser, disabled, onChange, className = "" }) {
-  return (
-    <SelectInput
-      className={`mt-0 ${className}`}
-      value={teamUser.role}
-      onChange={(event) => onChange(teamUser, event.target.value)}
-      disabled={disabled}
-      aria-label={`Change app role for ${teamUser.name}`}
-    >
-      {roleOptions.map((role) => (
-        <option key={role.value} value={role.value}>
-          {role.label}
-        </option>
-      ))}
-    </SelectInput>
-  );
-}
-
 export default function TeamPage() {
-  const { user, refreshUser } = useAuth();
+  const { user } = useAuth();
   const canManageRoles = isSuperAdmin(user);
-  const allowedCreateRoles = canManageRoles ? roleOptions : memberRoleOptions;
+  const allowedCreateRoles = canManageRoles ? elevatedRoleOptions : memberRoleOptions;
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [isRoleSaving, setIsRoleSaving] = useState(false);
   const [isUserSaving, setIsUserSaving] = useState(false);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
-  const [roleChange, setRoleChange] = useState(null);
   const [error, setError] = useState("");
 
   const loadUsers = async () => {
@@ -82,12 +52,6 @@ export default function TeamPage() {
     loadUsers();
   };
 
-  const requestRoleChange = (teamUser, nextRole) => {
-    if (!canManageRoles) return;
-    if (!teamUser || teamUser.role === nextRole) return;
-    setRoleChange({ user: teamUser, role: nextRole });
-  };
-
   const createUser = async (payload) => {
     setIsUserSaving(true);
     try {
@@ -99,30 +63,6 @@ export default function TeamPage() {
       toast.error(getErrorMessage(requestError));
     } finally {
       setIsUserSaving(false);
-    }
-  };
-
-  const confirmRoleChange = async () => {
-    if (!roleChange) return;
-
-    setIsRoleSaving(true);
-    try {
-      const { data } = await usersApi.updateRole(roleChange.user.id, roleChange.role);
-      setUsers((current) =>
-        current.map((teamUser) => (teamUser.id === data.user.id ? data.user : teamUser)),
-      );
-
-      if (data.user.id === user?.id) {
-        await refreshUser();
-      }
-
-      toast.success("Role updated");
-      setRoleChange(null);
-    } catch (requestError) {
-      setRoleChange(null);
-      toast.error(getErrorMessage(requestError));
-    } finally {
-      setIsRoleSaving(false);
     }
   };
 
@@ -168,25 +108,10 @@ export default function TeamPage() {
                   <div className="min-w-0">
                     <p className="break-words text-base font-bold text-ink">{teamUser.name}</p>
                     <p className="mt-1 text-xs font-semibold uppercase tracking-normal text-slate-500">
-                      App role
+                      Role
                     </p>
                   </div>
                   <Badge value={teamUser.role} />
-                </div>
-
-                <div className="mt-4">
-                  {canManageRoles ? (
-                    <RoleSelect
-                      teamUser={teamUser}
-                      disabled={isRoleSaving}
-                      onChange={requestRoleChange}
-                      className="w-full"
-                    />
-                  ) : (
-                    <div className="rounded-lg border border-slateLine bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700">
-                      {roleLabel(teamUser.role)}
-                    </div>
-                  )}
                 </div>
 
                 <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
@@ -220,7 +145,7 @@ export default function TeamPage() {
                       User
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-normal text-slate-500">
-                      App role
+                      Role
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-normal text-slate-500">
                       Projects
@@ -237,16 +162,7 @@ export default function TeamPage() {
                         <p className="font-semibold text-ink">{teamUser.name}</p>
                       </td>
                       <td className="px-4 py-4">
-                        {canManageRoles ? (
-                          <RoleSelect
-                            teamUser={teamUser}
-                            disabled={isRoleSaving}
-                            onChange={requestRoleChange}
-                            className="w-44"
-                          />
-                        ) : (
-                          <Badge value={teamUser.role} />
-                        )}
+                        <Badge value={teamUser.role} />
                       </td>
                       <td className="px-4 py-4 text-sm font-semibold text-slate-700">
                         {teamUser._count?.projectMemberships || 0}
@@ -264,18 +180,6 @@ export default function TeamPage() {
       ) : (
         <EmptyState title="No users found" description="Try another name." />
       )}
-      <ConfirmDialog
-        isOpen={Boolean(roleChange)}
-        onClose={() => setRoleChange(null)}
-        onConfirm={confirmRoleChange}
-        isLoading={isRoleSaving}
-        title="Change user role?"
-        description={
-          roleChange ? `${roleChange.user.name} will become ${roleSentence(roleChange.role)}.` : ""
-        }
-        confirmLabel="Change role"
-        confirmVariant="primary"
-      />
       <UserFormModal
         isOpen={isUserModalOpen}
         onClose={() => setIsUserModalOpen(false)}

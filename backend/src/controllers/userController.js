@@ -38,6 +38,10 @@ const createUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
   const role = req.body.role || "MEMBER";
 
+  if (role === "SUPERADMIN") {
+    throw new ApiError(400, "Only one super admin is allowed");
+  }
+
   if (!isSuperAdmin(req.user) && role !== "MEMBER") {
     throw new ApiError(403, "Only a super admin can create admin accounts");
   }
@@ -99,14 +103,12 @@ const updateUserRole = asyncHandler(async (req, res) => {
     throw new ApiError(404, "User not found");
   }
 
-  if (existingUser.role === "SUPERADMIN" && role !== "SUPERADMIN") {
-    const superAdminCount = await prisma.user.count({
-      where: { role: "SUPERADMIN" },
-    });
+  if (existingUser.role === "SUPERADMIN") {
+    throw new ApiError(400, "Super admin role cannot be changed");
+  }
 
-    if (superAdminCount <= 1) {
-      throw new ApiError(400, "At least one super admin must remain");
-    }
+  if (role === "SUPERADMIN") {
+    throw new ApiError(400, "Only one super admin is allowed");
   }
 
   const user = await prisma.user.update({
